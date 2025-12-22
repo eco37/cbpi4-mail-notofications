@@ -209,12 +209,15 @@ class mail_notifications(CBPiExtension):
 
     async def messageEvent(self, cbpi, title, message, type, action):
             # Create a multipart message and set headers
-            message = MIMEMultipart()
-            message["From"] = from_address
-            message["To"] = to_address
-            message["Subject"] = title
+            msg = MIMEMultipart()
+            msg["From"] = from_address
+            msg["To"] = to_address
+            msg["Subject"] = title
 
-            message.attach(MIMEText(message, "plain"))
+            msg.attach(MIMEText(message, "plain"))
+
+            print(title)
+            print(message)
 
             # Create a secure SSL context
             context = ssl.create_default_context()
