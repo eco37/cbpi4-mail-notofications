@@ -212,7 +212,7 @@ class mail_notifications(CBPiExtension):
             msg = MIMEMultipart()
             msg["From"] = from_address
             msg["To"] = to_address
-            msg["Subject"] = "CBPi - {}: {}".format(type.upper(),title)
+            msg["Subject"] = "CBPi - {}: {}".format(str(type).upper(),title)
 
             msg.attach(MIMEText(message, "plain"))
 
