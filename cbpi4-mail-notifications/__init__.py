@@ -221,5 +221,5 @@ class mail_notifications(CBPiExtension):
 
 
 def setup(cbpi):
-    cbpi.plugin.register("PushOver", PushOver)
+    cbpi.plugin.register("Mail Notifications", mail_notifications)
     pass
