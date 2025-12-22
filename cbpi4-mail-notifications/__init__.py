@@ -29,6 +29,8 @@ smtp_port = None
 smtp_user = None
 smtp_pass = None
 smtp_encryption = None
+from_address = None
+to_address = None
 
 class mail_notifications(CBPiExtension):
 
@@ -55,6 +57,12 @@ class mail_notifications(CBPiExtension):
             logger.warning('Check SMTP Username is set')
         elif smtp_pass is None or smtp_pass == "" or not smtp_pass:
             logger.warning('Check SMTP Password is set')
+        elif smtp_encryption is None or smtp_encryption == "" or not smtp_encryption:
+            logger.warning('Check SMTP Encryption is set')
+        elif from_address is None or from_address == "" or not from_address:
+            logger.warning('Check From Address is set')
+        elif to_address is None or to_address == "" or not to_address:
+            logger.warning('Check To Address is set')
         else:
             self.listener_ID = self.cbpi.notification.add_listener(self.messageEvent)
             logger.info("Mail Notifications Listener ID: {}".format(self.listener_ID))
@@ -66,12 +74,16 @@ class mail_notifications(CBPiExtension):
         global smtp_user
         global smtp_pass
         global smtp_encryption
+        global to_address
+        global from_address
 
         smtp_address = self.cbpi.config.get("smtp_address", None)
         smtp_port = self.cbpi.config.get("smtp_port", None)
         smtp_user = self.cbpi.config.get("smtp_user", None)
         smtp_pass = self.cbpi.config.get("smtp_pass", None)
         smtp_encryption = self.cbpi.config.get("smtp_encryption", None)
+        to_address = self.cbpi.config.get("smtp_to_address", None)
+        from_address = self.cbpi.config.get("smtp_from_address", None)
 
         if smtp_address is None:
             logger.info("INIT SMTP Address")
@@ -103,13 +115,6 @@ class mail_notifications(CBPiExtension):
                     logger.warning('Unable to update config')
                     logger.error(e)
 
-        if self.mail_notifications_update == None or self.mail_notifications_update != self.version:
-            try:
-                await self.cbpi.config.add(self.name+"_update", self.version, type=ConfigType.STRING, description="Mail Notifications Update Version",source="hidden")
-            except Exception as e:
-                logger.warning('Unable to update config')
-                logger.error(e)
-
 
         if smtp_user is None:
             logger.info("INIT SMTP User")
@@ -127,7 +132,7 @@ class mail_notifications(CBPiExtension):
                     logger.error(e)
 
         if smtp_pass is None:
-            logger.info("INIT SMTP Port")
+            logger.info("INIT SMTP Pass")
             try:
                 await self.cbpi.config.add("smtp_pass", "", type=ConfigType.STRING, description="SMTP Password",source=self.name)
             except Exception as e:
@@ -142,7 +147,7 @@ class mail_notifications(CBPiExtension):
                     logger.error(e)
 
         if smtp_encryption is None:
-            logger.info("INIT SMTP Port")
+            logger.info("INIT SMTP Encryption")
             try:
                 await self.cbpi.config.add("smtp_encryption", "TLS", type=ConfigType.SELECT, description="SMTP Encryption",source=self.name,
                                            options=[{"label":"TLS", "value":"TLS"},{"label":"SSL", "value":"SSL"},{"label":"Plain", "value":"Plain"}])
@@ -152,11 +157,45 @@ class mail_notifications(CBPiExtension):
         else:
             if self.mail_notifications_update == None or self.mail_notifications_update != self.version:
                 try:
-                    await self.cbpi.config.add("smtp_encryption", smtp_encryption, type=ConfigType.STRING, description="SMTP Encryption",source=self.name,
+                    await self.cbpi.config.add("smtp_encryption", smtp_encryption, type=ConfigType.SELECT, description="SMTP Encryption",source=self.name,
                                            options=[{"label":"TLS", "value":"TLS"},{"label":"SSL", "value":"SSL"},{"label":"Plain", "value":"Plain"}])
                 except Exception as e:
                     logger.warning('Unable to update config')
                     logger.error(e)
+
+
+        if from_address is None:
+            logger.info("INIT FROM ADDRESS")
+            try:
+                await self.cbpi.config.add("smtp_from_address", "", type=ConfigType.STRING, description="From Address",source=self.name)
+            except Exception as e:
+                logger.warning('Unable to update config')
+                logger.error(e)
+        else:
+            if self.mail_notifications_update == None or self.mail_notifications_update != self.version:
+                try:
+                    await self.cbpi.config.add("smtp_from_address", from_address, type=ConfigType.STRING, description="From Address",source=self.name)
+                except Exception as e:
+                    logger.warning('Unable to update config')
+                    logger.error(e)
+
+
+        if to_address is None:
+            logger.info("INIT TO ADDRESS")
+            try:
+                await self.cbpi.config.add("smtp_to_address", "", type=ConfigType.STRING, description="To Address",source=self.name)
+            except Exception as e:
+                logger.warning('Unable to update config')
+                logger.error(e)
+        else:
+            if self.mail_notifications_update == None or self.mail_notifications_update != self.version:
+                try:
+                    await self.cbpi.config.add("smtp_to_address", to_address, type=ConfigType.STRING, description="To Address",source=self.name)
+                except Exception as e:
+                    logger.warning('Unable to update config')
+                    logger.error(e)
+
+
 
 
         if self.mail_notifications_update == None or self.mail_notifications_update != self.version:
@@ -169,27 +208,10 @@ class mail_notifications(CBPiExtension):
 
 
     async def messageEvent(self, cbpi, title, message, type, action):
-
-            if smtp_address is None or smtp_address == "":
-                return
-
-            if smtp_port is None or  smtp_port == "":
-                return
-
-            if smtp_user is None or smtp_user == "":
-                return
-
-            if smtp_pass is None or smtp_pass == "":
-                return
-
-            if smtp_encryption is None or smtp_encryption == "":
-                return
-
-
             # Create a multipart message and set headers
             message = MIMEMultipart()
-            message["From"] = smtp_user
-            message["To"] = "max@bryggmasarna.se"
+            message["From"] = from_address
+            message["To"] = to_address
             message["Subject"] = title
 
             message.attach(MIMEText(message, "plain"))
