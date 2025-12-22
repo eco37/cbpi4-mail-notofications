@@ -237,7 +237,7 @@ class mail_notifications(CBPiExtension):
             if server != None:
                 try:
                     server.login(smtp_user, smtp_pass)
-                    server.sendmail(smtp_user, "max@bryggmasarna.se", message.as_string())
+                    server.sendmail(from_address, to_address, msg.as_string())
                 except Exception as e:
                     # Print any error messages to stdout
                     print(e)
