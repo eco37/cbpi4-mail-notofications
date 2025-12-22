@@ -212,7 +212,7 @@ class mail_notifications(CBPiExtension):
             msg = MIMEMultipart()
             msg["From"] = from_address
             msg["To"] = to_address
-            msg["Subject"] = title
+            msg["Subject"] = "CBPi - {}:{}".format(type,title)
 
             msg.attach(MIMEText(message, "plain"))
 
@@ -226,21 +226,22 @@ class mail_notifications(CBPiExtension):
             if smtp_encryption == "SSL":
                 server = smtplib.SMTP_SSL(smtp_address, smtp_port, context=context)
 
-            elif smtp_encryption == "TLS":
+            elif smtp_encryption == "TLS" or smtp_encryption == "Plain":
                 server = smtplib.SMTP(smtp_address, smtp_port)
-                try:
-                    server.starttls(context=context)
-                except Exception as e:
-                    # Print any error messages to stdout
-                    print(e)
+                if smtp_encryption == "TLS"
+                    try:
+                        server.starttls(context=context)
+                    except Exception as e:
+                        print(e)
+                        logger.warning(e)
 
             if server != None:
                 try:
                     server.login(smtp_user, smtp_pass)
                     server.sendmail(from_address, to_address, msg.as_string())
                 except Exception as e:
-                    # Print any error messages to stdout
                     print(e)
+                    logger.warning(e)
 
                 server.quit()
 
