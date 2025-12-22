@@ -61,11 +61,11 @@ class mail_notifications(CBPiExtension):
         pass
 
     async def mail_notifications_settings(self):
-        global smtp_address = None
-        global smtp_port = None
-        global smtp_user = None
-        global smtp_pass = None
-        global smtp_encryption = None
+        global smtp_address
+        global smtp_port
+        global smtp_user
+        global smtp_pass
+        global smtp_encryption
 
         smtp_address = self.cbpi.config.get("smtp_address", None)
         smtp_port = self.cbpi.config.get("smtp_port", None)
