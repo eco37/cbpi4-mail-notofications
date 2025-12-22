@@ -228,7 +228,7 @@ class mail_notifications(CBPiExtension):
 
             elif smtp_encryption == "TLS" or smtp_encryption == "Plain":
                 server = smtplib.SMTP(smtp_address, smtp_port)
-                if smtp_encryption == "TLS"
+                if smtp_encryption == "TLS":
                     try:
                         server.starttls(context=context)
                     except Exception as e:
