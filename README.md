@@ -4,6 +4,7 @@
 
 ### Software installation:
 Tested on Raspberry Pi OS Trixie
+
 CBPi version 4.7.0
 
 Please have a look at the [Craftbeerpi4 Documentation](https://openbrewing.gitbook.io/craftbeerpi4_support/readme/plugin-installation)
