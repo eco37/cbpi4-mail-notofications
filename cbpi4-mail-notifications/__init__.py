@@ -208,42 +208,45 @@ class mail_notifications(CBPiExtension):
 
 
     async def messageEvent(self, cbpi, title, message, type, action):
-            # Create a multipart message and set headers
-            msg = MIMEMultipart()
-            msg["From"] = from_address
-            msg["To"] = to_address
-            msg["Subject"] = "CBPi - {}: {}".format(str(type).upper(),title)
+        if str(type).lower() == "success":
+            return
 
-            msg.attach(MIMEText(message, "plain"))
+        # Create a multipart message and set headers
+        msg = MIMEMultipart()
+        msg["From"] = from_address
+        msg["To"] = to_address
+        msg["Subject"] = "CBPi - {}: {}".format(str(type).upper(),title)
 
-            print(title)
-            print(message)
+        msg.attach(MIMEText(message, "plain"))
 
-            # Create a secure SSL context
-            context = ssl.create_default_context()
-            server = None
+        print(title)
+        print(message)
 
-            if smtp_encryption == "SSL":
-                server = smtplib.SMTP_SSL(smtp_address, smtp_port, context=context)
+        # Create a secure SSL context
+        context = ssl.create_default_context()
+        server = None
 
-            elif smtp_encryption == "TLS" or smtp_encryption == "Plain":
-                server = smtplib.SMTP(smtp_address, smtp_port)
-                if smtp_encryption == "TLS":
-                    try:
-                        server.starttls(context=context)
-                    except Exception as e:
-                        print(e)
-                        logger.warning(e)
+        if smtp_encryption == "SSL":
+            server = smtplib.SMTP_SSL(smtp_address, smtp_port, context=context)
 
-            if server != None:
+        elif smtp_encryption == "TLS" or smtp_encryption == "Plain":
+            server = smtplib.SMTP(smtp_address, smtp_port)
+            if smtp_encryption == "TLS":
                 try:
-                    server.login(smtp_user, smtp_pass)
-                    server.sendmail(from_address, to_address, msg.as_string())
+                    server.starttls(context=context)
                 except Exception as e:
                     print(e)
                     logger.warning(e)
 
-                server.quit()
+        if server != None:
+            try:
+                server.login(smtp_user, smtp_pass)
+                server.sendmail(from_address, to_address, msg.as_string())
+            except Exception as e:
+                print(e)
+                logger.warning(e)
+
+            server.quit()
 
 
 def setup(cbpi):
